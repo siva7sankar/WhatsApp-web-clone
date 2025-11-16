@@ -11,38 +11,52 @@ class N8NService {
   }
 
   /**
-   * Send message to n8n webhook
-   */
-  async sendMessage(message) {
-    try {
-      const payload = this.createMessagePayload(message);
+ * Send message to n8n webhook
+ */
+async sendMessage(message) {
+  try {
+    const payload = this.createMessagePayload(message);
 
-      console.log('Sending message to n8n:', payload);
+    console.group('🚀 Sending to n8n');
+    console.log('URL:', N8N_WEBHOOK_URL);
+    console.log('Payload:', JSON.stringify(payload, null, 2));
+    console.log('Message Object:', message);
+    console.groupEnd();
 
-      const response = await axios.post(N8N_WEBHOOK_URL, payload, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        timeout: 30000, // 30 second timeout
-      });
+    const response = await axios.post(N8N_WEBHOOK_URL, payload, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      timeout: 30000,
+    });
 
-      console.log('n8n response:', response.data);
+    console.group('✅ n8n Response');
+    console.log('Status:', response.status);
+    console.log('Data:', response.data);
+    console.groupEnd();
 
-      return {
-        success: true,
-        data: response.data,
-        messageId: message.id,
-      };
-    } catch (error) {
-      console.error('Error sending message to n8n:', error);
+    return {
+      success: true,
+      data: response.data,
+      messageId: message.id,
+    };
+  } catch (error) {
+    console.group('❌ n8n Error');
+    console.error('Error Message:', error.message);
+    console.error('Error Response:', error.response?.data);
+    console.error('Error Status:', error.response?.status);
+    console.error('Error Headers:', error.response?.headers);
+    console.error('Full Error:', error);
+    console.groupEnd();
 
-      return {
-        success: false,
-        error: error.message,
-        messageId: message.id,
-      };
-    }
+    return {
+      success: false,
+      error: error.response?.data || error.message,
+      status: error.response?.status,
+      messageId: message.id,
+    };
   }
+}
 
   /**
    * Create WhatsApp-style message payload
