@@ -160,7 +160,7 @@ async sendMessage(message) {
    */
   async pollMessages() {
     try {
-      const pollUrl = `${N8N_WEBHOOK_URL}/poll`;
+      const pollUrl = `${N8N_WEBHOOK_URL}`;
       const response = await axios.get(pollUrl, {
         params: {
           userId: process.env.REACT_APP_USER_ID,
